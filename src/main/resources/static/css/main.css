@@ -1,0 +1,96 @@
+.home_container {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+.el-header {
+    background-color: #75adff;
+    padding: 0 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #ffffff;
+    font-size: 20px;
+}
+
+#qw1 {
+    display: flex;
+    align-items: center;
+}
+
+#qw2 {
+    margin-left: 15px;
+}
+
+.el-aside {
+    background-color: #ffffff;
+    border: 20px solid #d9e9ff;
+}
+
+.el-main {
+    background-color: #ffffff;
+    /*border: 20px solid #d9e9ff;*/
+    display: flex;
+    justify-content: space-between;
+    padding: 0;
+}
+
+.filter-container {
+    display: flex;
+    justify-content: center;
+
+
+}
+
+#container1 {
+    width: 30%;
+}
+
+#container2 {
+    width: 70%;
+}
+
+
+#el-aside2 {
+    border: 2px solid #d9e9ff;
+    width: 0;
+}
+
+.box-card {
+    margin-top: 10%;
+    margin-left: 10%;
+    width: 80%;
+    height: 150px;
+}
+
+.clearfix {
+    height: 4px;
+}
+
+
+#el-from-input {
+    width: 100%;
+}
+
+#el-from-input-right {
+    width: 100%;
+    padding: 20px 20px;
+
+}
+
+#p-des {
+    font-size: 4px;
+}
+
+.active {
+    display: none;
+/ / 隐藏
+}
+
+.active1 {
+    display: none;
+/ / 隐藏
+}
+
+

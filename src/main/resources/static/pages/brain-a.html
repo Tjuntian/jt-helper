@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="../plugins/elementui/index.css">
+    <link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/main.css">
+</head>
+
+
+<body>
+<div id="app">
+
+    <el-container class="home_container">
+        <el-container id="container1">
+            <!-- 左侧 -->
+            <el-aside width="40%">
+                <div class="filter-container">
+                    <el-button type="primary" class="butT" @click="handleCreate()">
+                        +记录
+                    </el-button>
+                </div>
+                <!-- 导航栏 -->
+                <el-menu>
+                    <!-- 一级菜单 -->
+                    <el-menu-item index="1">
+                        <span slot="title">全部笔记</span>
+                    </el-menu-item>
+                    <el-menu-item index="2">
+                        <span slot="title">星标笔记</span>
+                    </el-menu-item>
+                    <el-menu-item index="2">
+                        <span slot="title">最近删除</span>
+                    </el-menu-item>
+                </el-menu>
+            </el-aside>
+            <!--侧边栏二-->
+            <el-aside width="60%">
+                <div class="filter-container">
+                    <el-input placeholder="搜索记录" v-model="pagination.queryString" class="input-with-select"
+                              :style="{width: '90%'}">
+                        <el-button slot="append" icon="el-icon-search" @click="findLike()"></el-button>
+                    </el-input>
+                </div>
+
+                <!--卡片-->
+
+                <div v-for="item in dataList">
+                    <a @click="showItem(item.id)">
+                        <el-card class="box-card">
+                            <div slot="header" class="clearfix">
+                                <el-button style="float: right; padding: 3px 0" type="text"
+                                           @click="deleteItem(item.id)">
+                                    删除
+                                </el-button>
+                                <p style="font-size: 10px">{{item.name}}</p>
+                            </div>
+                            <div class="text item">
+                                <p id="p-des">{{item.description}}</p>
+                            </div>
+                        </el-card>
+                    </a>
+                </div>
+            </el-aside>
+        </el-container>
+        <el-container id="container2">
+
+            <!-- 头部 -->
+            <el-header class="el-header">
+                <div id="qw1">
+                    <img class="home_logo" src="../assets/myLogo.png" alt=""/>
+                    <span id="qw2">JT-Helper</span>
+                </div>
+
+                <!--按钮-->
+                <div>
+                    <el-button :class="{ active: isActive }" type="primary" plain @click="editText()">
+                        编辑
+                    </el-button>
+                    <el-button :class="{ active1: isActive1 }" type="primary" plain @click="submitText()">
+                        确认
+                    </el-button>
+                    <el-button :class="{ active1: isActive1 }" type="primary" plain @click="submitCancelText()">
+                        取消
+                    </el-button>
+                    <!--                    <el-button :class="{ active2: isActive2 }" type="primary" plain @click="saveText()">-->
+                    <!--                        保存-->
+                    <!--                    </el-button>-->
+                </div>
+            </el-header>
+
+            <!-- 主题 -->
+            <el-main>
+                <el-aside id="el-aside2" width="0">
+                    <!-- 输入表单 -->
+                    <el-form id="el-from-input" ref="dataAddForm" :rules="rules" :model="formData" size="small">
+                        <el-form-item label="" prop="name">
+                            <el-input v-model="formData.name" placeholder="标题"></el-input>
+                        </el-form-item>
+                        <el-form-item label="" prop="description">
+                            <el-input :rows="30" class="el-form-input" v-model="formData.description" type="textarea"
+                                      placeholder="内容"></el-input>
+                        </el-form-item>
+                    </el-form>
+                </el-aside>
+                <el-main>
+                    <div id="el-from-input-right">
+                        <h1 style="font-size: 30px" v-html="formData.name"></h1>
+                        <p v-html="markdown"></p>
+                    </div>
+                </el-main>
+            </el-main>
+        </el-container>
+    </el-container>
+
+</div>
+</body>
+
+<!-- 引入组件库 -->
+<script src="../js/vue.js"></script>
+<script src="../plugins/elementui/index.js"></script>
+<script type="text/javascript" src="../js/jquery.min.js"></script>
+<script src="../js/axios-0.18.0.js"></script>
+<script src="../js/marked.min.js"></script>
+
+<script>
+    const vue = new Vue({
+        el: '#app',
+        computed: {
+            markdown() {
+                let result = marked.parse(this.formData.description);
+                return result;
+            }
+        },
+        data: {
+            pagination: {
+                queryString: ""
+            },
+            //表单
+            formData: {
+                id: null,
+                name: '',
+                description: ''
+            },
+            //卡片
+            dataList: [{
+                name: "",
+                description: ""
+            }],
+            // marked页面
+            // htmlData:{
+            //     name: '',
+            //     description: ''
+            // },
+            //设置按钮的初始显示，当布尔值为true时，对应的属性active生效，即隐藏
+            isActive: false,
+            isActive1: true,
+
+            //新增还是修改
+            isAdd: false,
+            // isActive2: true,
+            rules: {
+                //校验规则
+                name: [{required: true, message: '名称为必填项', trigger: 'blur'}],
+                description: [{required: true, message: '名称为必填项', trigger: 'blur'}]
+            }
+        },
+        //编辑
+        methods: {
+            //收起
+            close() {
+                let ela = document.getElementById('el-aside2');
+                ela.style.width = '0';
+            },
+            //打开
+            open() {
+                let ela = document.getElementById('el-aside2');
+                ela.style.width = '40%';
+            },
+            //重置表单
+            resetFormOnly() {
+                this.formData.name = null;
+                this.formData.description = null;
+            },
+            resetForm() {
+                this.formData.id = null;
+                this.formData.name = '';
+                this.formData.description = '';
+                this.dataList = null;
+                this.pagination.queryString = null;
+            },
+            resetFormNoId() {
+                // this.formData.id = null;
+                this.formData.name = '';
+                this.formData.description = '';
+                this.dataList = null;
+                // this.pagination.queryString = null;
+            },
+            //新增按钮
+            handleCreate() {
+                console.log(this.isAdd);
+                if (this.isAdd === false) {
+                    this.isAdd = true;
+                    this.resetForm();
+
+                    if (this.isActive === false && this.isActive1 === true) {
+                        //当点击按钮触发事件时改变两个按钮的显示
+                        this.isActive = !this.isActive;
+                        this.isActive1 = !this.isActive1;
+                    }
+
+                    this.open();
+                }
+            },
+            // //保存新建的数据
+            // saveText() {
+            //
+            // },
+            editText() {
+                console.log(this.formData.id);
+                console.log(this.isAdd);
+                if (this.isAdd) {
+                    console.log("-----")
+                    this.isAdd = false;
+                }
+                //当点击按钮触发事件时改变两个按钮的显示
+                this.isActive = !this.isActive;
+                this.isActive1 = !this.isActive1;
+
+                this.open();
+
+                //this.formData.name = this.formData.name;
+                //this.formData.description = this.formData.description;
+
+                // this.htmlText =
+                //     marked.parse('# 你好\n\n我是 **marked**.');
+            },
+
+            //提交
+            submitText() {
+                if (this.isAdd) {
+                    console.log("-----")
+                    axios.post("/brain", this.formData).then((resp) => {
+                        this.dialogFormVisible = false;
+                        if (resp.data.code == 20011) {
+                            this.$message.success("添加成功");
+                            this.isActive = !this.isActive;
+                            this.isActive1 = !this.isActive1;
+                            this.isAdd = false;
+                            this.close();
+                            this.resetFormNoId();
+                        } else {
+                            this.$message.error("添加失败");
+                        }
+                    })
+                }
+                axios.put("/brain/", this.formData).then((resp) => {
+                    if (resp.data.code == 20031) {
+                        this.$message.success("修改成功");
+                        //当点击按钮触发事件时改变两个按钮的显示
+                        this.isActive = !this.isActive;
+                        this.isActive1 = !this.isActive1;
+                        this.close();
+                    } else if (resp.data.code == 20030) {
+                        if (this.formData.id === -1) {
+                            this.$message.error("记录不存在");
+                        } else {
+                            this.$message.error("修改错误");
+                        }
+
+                    } else {
+                        this.$message.error(resp.data.msg);
+                    }
+                }).finally(() => {
+                    this.findLike();
+                    console.log(this.formData);
+                })
+
+            },
+            //提交取消
+            submitCancelText() {
+
+                //取消新增
+                if (this.isAdd) {
+                    this.isAdd = false;
+                    this.resetFormNoId();
+                }
+                //当点击按钮触发事件时改变两个按钮的显示
+                this.isActive = !this.isActive;
+                this.isActive1 = !this.isActive1;
+
+                // console.log(this.formData.id);
+                if (this.formData.id !== null) {
+                    console.log(this.formData.id);
+                    this.showItem(this.formData.id);
+                }
+
+
+                this.close();
+            },
+            //模糊查询
+            findLike() {
+                if (this.formData.id === null) {
+                    this.formData.id = -1;
+                    this.resetFormNoId();
+                }
+                axios.get("/brain/like/" + this.pagination.queryString).then((resp) => {
+                    if (resp.data.code == 20041) {
+                        this.dataList = resp.data.data;
+                    } else {
+                        this.$message.error("查询错误");
+                    }
+                })
+
+            },
+            /*删除一个记录*/
+            deleteItem(id) {
+                this.$confirm("是否删除?", "提示", {type: "info"}).then(() => {
+                    //确认
+                    if (this.formData.id !== null) {
+                        axios.delete("/brain/" + id).then((resp) => {
+                            if (resp.data.code == 20021) {
+                                this.$message.success("删除成功");
+                            } else {
+                                this.$message.error("删除失败");
+                            }
+                        }).finally(() => {
+                            //最后
+                            this.formData.id = null;
+                            this.findLike();
+                            console.log(this.formData);
+                        })
+                    }
+                }).catch(() => {
+                    //取消
+                })
+            },
+            //点击卡片后右边显示内容
+            showItem(id) {
+                console.log(this.formData.id)
+                if (this.formData.id !== null) {
+                    axios.get("/brain/one/" + id).then((resp) => {
+                        if (resp.data.code == 20041) {
+                            this.formData.id = resp.data.data.id;
+                            this.formData.name = resp.data.data.name;
+                            this.formData.description = resp.data.data.description;
+                        }else if(this.formData.id===-1){
+                            this.$message.error('请选择一条记录!');
+                        }
+                        else {
+                            this.$message.error('查询失败');
+                        }
+                    })
+                }
+            }
+        }
+    })
+</script>
+
+</html>

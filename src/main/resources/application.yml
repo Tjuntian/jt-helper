@@ -1,0 +1,15 @@
+server:
+  port: 8085
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/jt_helper?serverTimezone=UTC&useSSL=false
+    username: root
+    password: 1234
+  devtools:
+    livereload:
+      enabled: true
+logging:
+  level:
+    com.asphyxia: debug
