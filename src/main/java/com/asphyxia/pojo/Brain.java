@@ -21,15 +21,17 @@ public class Brain implements Serializable {
     private Integer id;
     private String name;
     private String description;
+    private String username;
 
 
     public Brain() {
     }
 
-    public Brain(Integer id, String name, String description) {
+    public Brain(Integer id, String name, String description, String username) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.username = username;
     }
 
     /**
@@ -80,7 +82,23 @@ public class Brain implements Serializable {
         this.description = description;
     }
 
+    /**
+     * 获取
+     * @return username
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * 设置
+     * @param username
+     */
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public String toString() {
-        return "Brain{id = " + id + ", name = " + name + ", description = " + description + "}";
+        return "Brain{id = " + id + ", name = " + name + ", description = " + description + ", username = " + username + "}";
     }
 }
