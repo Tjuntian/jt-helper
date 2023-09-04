@@ -70,7 +70,5 @@
 ## 技术栈
 
 - Vue
-- [IconPark](https://iconpark.oceanengine.com/official)
-- [xicons](https://xicons.org/)
 - Vue-cli
 - bytemd
